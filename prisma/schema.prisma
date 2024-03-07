@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  // lucia internal fields
+  id       String    @id
+  sessions Session[]
+
+  // custom fields
+  username String @unique
+  password String
+
+  @@map("lucia_user")
+}
+
+model Session {
+  // lucia internal fields
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@map("lucia_session")
+}
