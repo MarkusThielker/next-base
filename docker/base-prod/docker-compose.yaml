@@ -1,0 +1,76 @@
+services:
+
+  app-migrations:
+    container_name: base_migrations
+    image: markusthielker/next-base:1.0.0
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: [ "npx", "prisma", "migrate", "deploy" ]
+    networks:
+      - internal
+
+  app:
+    container_name: base_app
+    image: markusthielker/next-base:1.0.0
+    env_file:
+      - .env
+    depends_on:
+      app-migrations:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.xyz-base.rule=Host(`base.thielker.xyz`)"
+      - "traefik.http.routers.xyz-base.entrypoints=web, websecure"
+      - "traefik.http.routers.xyz-base.tls=true"
+      - "traefik.http.routers.xyz-base.tls.certresolver=lets-encrypt"
+    networks:
+      - web
+      - internal
+
+  app-studio:
+    container_name: base_studio
+    image: markusthielker/next-base:1.0.0
+    env_file:
+      - .env
+    depends_on:
+      app-migrations:
+        condition: service_completed_successfully
+    command: "npx prisma studio"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.xyz-base-studio.rule=Host(`db.base.thielker.xyz`)"
+      - "traefik.http.routers.xyz-base-studio.entrypoints=web, websecure"
+      - "traefik.http.services.xyz-finances-db.loadbalancer.server.port=5555"
+      - "traefik.http.routers.xyz-base-studio.tls=true"
+      - "traefik.http.routers.xyz-base-studio.tls.certresolver=lets-encrypt"
+    networks:
+      - web
+      - internal
+
+  postgres:
+    container_name: base_postgres
+    image: postgres:15.2
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: base
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+networks:
+  web:
+    external: true
+  internal:

@@ -11,6 +11,8 @@ export const lucia = new Lucia(adapter, {
     sessionCookie: {
         expires: false,
         attributes: {
+            sameSite: 'strict',
+            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined,
             secure: process.env.NODE_ENV === 'production',
         },
     },

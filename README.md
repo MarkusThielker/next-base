@@ -14,6 +14,6 @@ This base already implements the sign-up and sign-in process with a clean UI, re
 
 ## Next Steps
 
-- Dockerfile
-- Deployment Pipeline
 - Documentation
+- Switching dark and light mode
+- Change own username and password
