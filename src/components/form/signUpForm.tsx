@@ -64,6 +64,19 @@ export default function SignUpForm({onSubmit}: {
                         </FormItem>
                     )}
                 />
+                <FormField
+                    control={form.control}
+                    name="confirm"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Confirm password</FormLabel>
+                            <FormControl>
+                                <Input placeholder="••••••••" type="password" {...field} />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
                 <Button type="submit" className="w-full">Create Account</Button>
             </form>
         </Form>
