@@ -21,7 +21,7 @@ export default async function AccountPage() {
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center relative">
-            <Button variant="ghost" size="icon" className="absolute top-4 left-4" asChild>
+            <Button variant="outline" size="icon" className="absolute top-4 left-4" asChild>
                 <Link href={URL_HOME}>
                     <ChevronLeft/>
                 </Link>
